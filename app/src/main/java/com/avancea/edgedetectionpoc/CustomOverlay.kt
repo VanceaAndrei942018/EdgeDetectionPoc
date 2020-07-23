@@ -63,5 +63,6 @@ internal class CustomOverlay @JvmOverloads constructor(
 
     fun processFrame(frame: Bitmap?) {
         setImageBitmap(frame)
+        requestLayout()
     }
 }

@@ -52,7 +52,7 @@ import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 
 class Camera2BasicFragment : Fragment(),
-    View.OnClickListener, OnRequestPermissionsResultCallback {
+    OnRequestPermissionsResultCallback {
     companion object {
         /**
          * Conversion from screen rotation to JPEG orientation.
@@ -420,8 +420,6 @@ class Camera2BasicFragment : Fragment(),
         view: View,
         savedInstanceState: Bundle?
     ) {
-        view.findViewById<View>(R.id.picture).setOnClickListener(this)
-        view.findViewById<View>(R.id.info).setOnClickListener(this)
         mTextureView = view.findViewById<View>(R.id.texture) as AutoFitTextureView
         overlay = view.findViewById(R.id.overlay)
     }
@@ -764,10 +762,8 @@ class Camera2BasicFragment : Fragment(),
         if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY())
             matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL)
-            val scale = Math.max(
-                viewHeight.toFloat() / mPreviewSize!!.height,
-                viewWidth.toFloat() / mPreviewSize!!.width
-            )
+            val scale =
+                (viewHeight.toFloat() / mPreviewSize!!.height).coerceAtLeast(viewWidth.toFloat() / mPreviewSize!!.width)
             matrix.postScale(scale, scale, centerX, centerY)
             matrix.postRotate(90 * (rotation - 2).toFloat(), centerX, centerY)
         } else if (Surface.ROTATION_180 == rotation) {
@@ -908,23 +904,6 @@ class Camera2BasicFragment : Fragment(),
             )
         } catch (e: CameraAccessException) {
             e.printStackTrace()
-        }
-    }
-
-    override fun onClick(view: View) {
-        when (view.id) {
-            R.id.picture -> {
-                takePicture()
-            }
-            R.id.info -> {
-                val activity: Activity? = activity
-                if (null != activity) {
-                    AlertDialog.Builder(activity)
-                        .setMessage(R.string.intro_message)
-                        .setPositiveButton(android.R.string.ok, null)
-                        .show()
-                }
-            }
         }
     }
 
